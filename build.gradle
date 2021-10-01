@@ -1,7 +1,9 @@
 plugins {
+    id 'org.sonarqube' version '2.7'
     id 'org.springframework.boot' version '2.5.5'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id 'jacoco'
 }
 
 group = 'com.example'
@@ -31,4 +33,25 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport // report is always generated after tests run
 }
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+    dependsOn test // tests are required to run before generating the report
+}
+
+sonarqube {
+    properties {
+        property 'sonar.host.url', 'http://localhost:9000'
+        property 'sonar.projectKey', 'testing-demo'
+        property 'sonar.login', 'ee80566e2e31800abfe04852bb196f9250153c51'
+    }
+}
+
+tasks.named('sonarqube').configure {
+    dependsOn test
+}
+
